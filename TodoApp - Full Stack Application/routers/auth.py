@@ -4,7 +4,6 @@ sys.path.append("..")
 
 from starlette.responses import RedirectResponse
 from fastapi import Depends, HTTPException, status, APIRouter, Request, Response, Form
-from pydantic import BaseModel
 from typing import Optional
 import models
 from passlib.context import CryptContext
@@ -18,7 +17,6 @@ from fastapi.templating import Jinja2Templates
 
 SECRET_KEY = "KlgH6AzYDeZeGwD288to79I3vTHT8wp7"
 ALGORITHM = "HS256"
-
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -157,7 +155,6 @@ async def registration_page(request: Request):
 async def registration_page(request: Request, email: str = Form(...), username: str = Form(...),
                             firstname: str = Form(...), lastname: str = Form(...), password: str = Form(...),
                             password2: str = Form(...), db: Session = Depends(get_db)):
-
     validation1 = db.query(models.Users).filter(models.Users.username == username).first()
 
     validation2 = db.query(models.Users).filter(models.Users.email == email).first()

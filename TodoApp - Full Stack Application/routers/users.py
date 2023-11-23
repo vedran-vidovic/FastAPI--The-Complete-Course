@@ -5,19 +5,14 @@ from routers.auth import get_current_user
 sys.path.append("..")
 
 from starlette.responses import RedirectResponse
-from fastapi import Depends, HTTPException, status, APIRouter, Request, Response, Form
-from pydantic import BaseModel
-from typing import Optional
+from fastapi import Depends, status, APIRouter, Request, Form
 import models
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from datetime import datetime, timedelta
-from jose import jwt, JWTError
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from routers.auth import authenticate_user
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -65,7 +60,8 @@ async def change_user_password_commit(request: Request,
 
     if user is None or not bcrypt_context.verify(password1, user.hashed_password):
         msg = 'Please type correct current username & password'
-        return templates.TemplateResponse("change-password.html", {"request": request, "msg": msg, "user": current_user})
+        return templates.TemplateResponse("change-password.html",
+                                          {"request": request, "msg": msg, "user": current_user})
 
     hashed_password2 = bcrypt_context.hash(password2)
     user.hashed_password = hashed_password2
