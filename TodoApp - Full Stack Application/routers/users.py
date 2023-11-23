@@ -57,17 +57,11 @@ async def change_user_password_commit(request: Request,
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
     user = db.query(models.Users).filter(models.Users.username == username).first()
+    msg = 'Please type correct current username & password'
+    if user is not None and bcrypt_context.verify(password1, user.hashed_password):
+        user.hashed_password = bcrypt_context.hash(password2)
+        db.add(user)
+        db.commit()
+        msg = 'Password Change Successful'
 
-    if user is None or not bcrypt_context.verify(password1, user.hashed_password):
-        msg = 'Please type correct current username & password'
-        return templates.TemplateResponse("change-password.html",
-                                          {"request": request, "msg": msg, "user": current_user})
-
-    hashed_password2 = bcrypt_context.hash(password2)
-    user.hashed_password = hashed_password2
-
-    db.add(user)
-    db.commit()
-
-    msg = 'Password Change Successful'
     return templates.TemplateResponse("change-password.html", {"request": request, "msg": msg, "user": current_user})
